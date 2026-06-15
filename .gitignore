@@ -1,0 +1,12 @@
+# Tooling local de Claude Code / preview (no es parte del sitio)
+.claude/
+
+# Netlify
+.netlify/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
