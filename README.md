@@ -19,7 +19,7 @@ Hero · Problema/Solución · Demos en vivo · Cómo trabajo · Caso real · Cie
 ## Deploy
 **En vivo:** https://mr-soluciones.netlify.app/
 
-Sitio estático publicado en Netlify vía **Drop** (arrastrar la carpeta a
-netlify.com/drop). OJO: como se subió por Drop (no conectado a este repo), cada
-cambio requiere **volver a arrastrar la carpeta** para actualizar el sitio. Cambiar número/mensaje de WhatsApp: variables `PHONE` y
+Sitio estático en Netlify, **conectado a este repo de GitHub** (rama `main`) con
+deploy automático: cada `git push` redeploya solo (build vacío, publish dir = raíz).
+Ya no hace falta arrastrar la carpeta. Cambiar número/mensaje de WhatsApp: variables `PHONE` y
 `MSG` en el `<script>` al final de `index.html`.
