@@ -1,170 +1,178 @@
 <!DOCTYPE html>
-<html>
+<!--
+  Fuente de la imagen de vista previa (og:image, 1200x630).
+  No se abre a mano: se renderiza con Chrome headless y la captura ES assets/og.png.
+
+    chrome --headless=new --hide-scrollbars --force-device-scale-factor=1 \
+           --window-size=1200,630 --virtual-time-budget=6000 \
+           --screenshot=assets/og.png assets/og-generate.html
+
+  Antes esto era un <canvas> que posicionaba cada texto con coordenadas fijas;
+  cuando un texto crecía se metía debajo del de al lado sin avisar. Con HTML+CSS
+  el ancho de cada elemento lo define su propio contenido, así que el copy se
+  puede editar libremente y nada se pisa.
+
+  Requiere red la primera vez, para bajar la tipografía de Google Fonts. Sin red
+  cae al stack del sistema y la imagen sale distinta: verificarla antes de subirla.
+-->
+<html lang="es">
 <head>
 <meta charset="UTF-8"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  body{margin:0;background:#111;display:flex;flex-direction:column;align-items:center;padding:20px;gap:16px;font-family:system-ui}
-  canvas{border:1px solid #333;max-width:100%}
-  button{background:#C9A227;border:none;padding:12px 28px;font-size:1rem;font-weight:700;border-radius:8px;cursor:pointer}
+  :root{
+    --navy:#1F2A44;
+    --gold:#C9A227;
+    --muted:rgba(200,207,222,.85);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{overflow:hidden;background:#000}
+
+  /* Lienzo exacto de Open Graph. Chrome lo captura 1:1. */
+  .og{
+    position:relative;
+    width:1200px;height:630px;
+    background:var(--navy);
+    font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
+    color:#fff;
+    display:flex;align-items:center;
+    padding:0 72px;
+    gap:56px;
+    overflow:hidden;
+  }
+
+  /* Halos dorados. El stop final repite el MISMO dorado con alfa 0:
+     `transparent` es rgba(0,0,0,0) — negro — y degradar hacia negro
+     ensucia el tono a oliva. */
+  .og::before,.og::after{content:"";position:absolute;inset:0;pointer-events:none}
+  .og::before{
+    background:radial-gradient(760px 620px at 100% 0%,
+      rgba(201,162,39,.30) 0%, rgba(201,162,39,.12) 38%, rgba(201,162,39,0) 72%);
+  }
+  .og::after{
+    background:radial-gradient(520px 460px at 0% 100%,
+      rgba(201,162,39,.13) 0%, rgba(201,162,39,0) 70%);
+  }
+
+  .col{position:relative;z-index:1}
+
+  /* ── Columna izquierda ───────────────────────────────────── */
+  .left{
+    flex:1 1 0;min-width:0;
+    border-left:5px solid var(--gold);
+    padding-left:34px;
+    display:flex;flex-direction:column;align-items:flex-start;
+  }
+  .mark{
+    width:88px;height:88px;border-radius:20px;
+    background:var(--gold);color:var(--navy);
+    display:flex;align-items:center;justify-content:center;
+    font-size:40px;font-weight:800;letter-spacing:.02em;
+    margin-bottom:26px;
+  }
+  .name{
+    font-size:76px;font-weight:800;line-height:1;
+    letter-spacing:-.02em;
+    margin-bottom:16px;
+  }
+  .tagline{
+    color:var(--gold);
+    font-size:27px;font-weight:600;line-height:1.25;
+    letter-spacing:-.005em;
+    white-space:nowrap;
+    margin-bottom:22px;
+  }
+  .rule{
+    width:100%;max-width:520px;height:1.5px;
+    background:rgba(201,162,39,.35);
+    margin-bottom:20px;
+  }
+  /* Flex + gap: el ancho de cada badge lo define su propio texto,
+     así que no pueden pisarse por más que cambie el copy. */
+  .badges{
+    display:flex;flex-wrap:wrap;align-items:center;
+    column-gap:22px;row-gap:10px;
+    margin-bottom:34px;
+  }
+  .badge{
+    display:flex;align-items:center;gap:9px;
+    color:var(--muted);font-size:19px;font-weight:500;
+    white-space:nowrap;
+  }
+  .badge::before{
+    content:"";width:10px;height:10px;border-radius:50%;
+    background:var(--gold);flex:none;
+  }
+  .url{color:rgba(174,182,200,.6);font-size:20px;font-weight:500}
+
+  /* ── Mockup derecho ──────────────────────────────────────── */
+  .panel{
+    flex:0 0 360px;
+    background:rgba(255,255,255,.07);
+    border:1.5px solid rgba(255,255,255,.12);
+    border-radius:20px;
+    overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  .panel-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 18px;height:52px;
+    background:rgba(201,162,39,.18);
+    color:var(--gold);font-size:16px;font-weight:700;
+  }
+  .live{color:rgba(231,199,90,.9);font-size:11px;font-weight:700;letter-spacing:.08em}
+  .slots{padding:14px;display:flex;flex-direction:column;gap:16px}
+  .slot{
+    display:flex;align-items:center;justify-content:space-between;
+    height:52px;padding:0 16px;border-radius:12px;
+    font-size:15px;font-weight:600;color:rgba(255,255,255,.88);
+  }
+  .tag{
+    font-size:11px;font-weight:700;
+    padding:5px 11px;border-radius:999px;white-space:nowrap;
+  }
+  .s-free{background:rgba(26,122,69,.22)}
+  .s-free .tag{color:#4ade80;background:rgba(74,222,128,.2)}
+  .s-busy{background:rgba(178,59,59,.18)}
+  .s-busy .tag{color:#f87171;background:rgba(248,113,113,.15)}
+  .s-pick{background:rgba(201,162,39,.22)}
+  .s-pick .tag{color:var(--gold);background:rgba(201,162,39,.25)}
+  .confirm{
+    margin:6px 14px 14px;height:42px;border-radius:12px;
+    background:#25D366;color:#04361b;
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;white-space:nowrap;
+  }
 </style>
 </head>
 <body>
-<canvas id="og" width="1200" height="630"></canvas>
-<button onclick="dl()">Descargar og.png</button>
-<script>
-const c = document.getElementById('og');
-const x = c.getContext('2d');
-const W = 1200, H = 630;
+<div class="og">
 
-// Fondo navy
-x.fillStyle = '#1F2A44';
-x.fillRect(0, 0, W, H);
+  <div class="col left">
+    <div class="mark">MR</div>
+    <div class="name">MR Soluciones</div>
+    <div class="tagline">Sistemas de reserva y automatización a medida</div>
+    <div class="rule"></div>
+    <div class="badges">
+      <span class="badge">Prueba gratis 2 semanas</span>
+      <span class="badge">Sin permanencia</span>
+      <span class="badge">Listo en días</span>
+    </div>
+    <div class="url">mr-soluciones.netlify.app</div>
+  </div>
 
-// Halo dorado top-right
-const g1 = x.createRadialGradient(W, 0, 0, W, 0, 560);
-g1.addColorStop(0, 'rgba(201,162,39,.28)');
-g1.addColorStop(1, 'transparent');
-x.fillStyle = g1;
-x.fillRect(0, 0, W, H);
+  <div class="col panel">
+    <div class="panel-head"><span>Reservá tu turno</span><span class="live">EN VIVO</span></div>
+    <div class="slots">
+      <div class="slot s-free"><span>Sábado 15:00 hs</span><span class="tag">Libre</span></div>
+      <div class="slot s-busy"><span>Sábado 17:00 hs</span><span class="tag">Ocupado</span></div>
+      <div class="slot s-pick"><span>Domingo 16:00 hs</span><span class="tag">Elegido</span></div>
+    </div>
+    <div class="confirm">✓ Confirmada — te llega por WhatsApp</div>
+  </div>
 
-// Halo sutil bottom-left
-const g2 = x.createRadialGradient(0, H, 0, 0, H, 360);
-g2.addColorStop(0, 'rgba(201,162,39,.10)');
-g2.addColorStop(1, 'transparent');
-x.fillStyle = g2;
-x.fillRect(0, 0, W, H);
-
-// Línea decorativa dorada izquierda
-x.fillStyle = '#C9A227';
-x.fillRect(72, 160, 5, 310);
-
-// Logo box "MR"
-rr(x, 104, 170, 88, 88, 18);
-x.fillStyle = '#C9A227';
-x.fill();
-x.fillStyle = '#1F2A44';
-x.font = 'bold 40px system-ui,-apple-system,sans-serif';
-x.textAlign = 'center';
-x.textBaseline = 'middle';
-x.fillText('MR', 148, 214);
-
-// Nombre
-x.fillStyle = '#ffffff';
-x.font = 'bold 76px system-ui,-apple-system,sans-serif';
-x.textAlign = 'left';
-x.textBaseline = 'alphabetic';
-x.fillText('MR Soluciones', 104, 350);
-
-// Tagline dorado
-x.fillStyle = '#C9A227';
-x.font = '600 30px system-ui,-apple-system,sans-serif';
-x.fillText('Sistemas de reserva y automatización a medida', 104, 404);
-
-// Separador
-x.fillStyle = 'rgba(201,162,39,.35)';
-x.fillRect(104, 432, 520, 1.5);
-
-// Trust badges
-const badges = ['Prueba gratis 2 semanas', 'Sin permanencia', 'Listo en días'];
-x.font = '500 22px system-ui,-apple-system,sans-serif';
-badges.forEach((b, i) => {
-  const bx = 104 + i * 190;
-  // punto dorado
-  x.fillStyle = '#C9A227';
-  x.beginPath();
-  x.arc(bx + 8, 468, 5, 0, Math.PI * 2);
-  x.fill();
-  // texto
-  x.fillStyle = 'rgba(200,207,222,.85)';
-  x.textAlign = 'left';
-  x.fillText(b, bx + 20, 474);
-});
-
-// URL
-x.fillStyle = 'rgba(174,182,200,.6)';
-x.font = '500 20px system-ui,-apple-system,sans-serif';
-x.textAlign = 'left';
-x.fillText('mr-soluciones.netlify.app', 104, 548);
-
-// Panel derecho — mockup minimalista
-const px = 750, py = 130, pw = 360, ph = 370;
-rr(x, px, py, pw, ph, 20);
-x.fillStyle = 'rgba(255,255,255,.07)';
-x.fill();
-x.strokeStyle = 'rgba(255,255,255,.12)';
-x.lineWidth = 1.5;
-x.stroke();
-
-// Header del mockup
-rr(x, px, py, pw, 52, [20, 20, 0, 0]);
-x.fillStyle = 'rgba(201,162,39,.18)';
-x.fill();
-x.fillStyle = '#C9A227';
-x.font = 'bold 16px system-ui,-apple-system,sans-serif';
-x.textAlign = 'left';
-x.fillText('Reservá tu turno', px + 18, py + 31);
-x.fillStyle = 'rgba(231,199,90,.9)';
-x.font = 'bold 11px system-ui,-apple-system,sans-serif';
-x.textAlign = 'right';
-x.fillText('EN VIVO', px + pw - 18, py + 31);
-
-// Slots
-const slots = [
-  {label:'Sábado 15:00 hs', tag:'Libre', bg:'rgba(26,122,69,.22)', tc:'#4ade80', tbc:'rgba(74,222,128,.2)'},
-  {label:'Sábado 17:00 hs', tag:'Ocupado', bg:'rgba(178,59,59,.18)', tc:'#f87171', tbc:'rgba(248,113,113,.15)'},
-  {label:'Domingo 16:00 hs', tag:'Elegido', bg:'rgba(201,162,39,.22)', tc:'#C9A227', tbc:'rgba(201,162,39,.25)'},
-];
-slots.forEach((s, i) => {
-  const sy = py + 72 + i * 68;
-  rr(x, px + 14, sy, pw - 28, 52, 12);
-  x.fillStyle = s.bg;
-  x.fill();
-  x.fillStyle = 'rgba(255,255,255,.88)';
-  x.font = '600 15px system-ui,-apple-system,sans-serif';
-  x.textAlign = 'left';
-  x.fillText(s.label, px + 30, sy + 31);
-  // tag
-  const tw = x.measureText(s.tag).width + 20;
-  rr(x, px + pw - 28 - tw, sy + 14, tw, 24, 999);
-  x.fillStyle = s.tbc;
-  x.fill();
-  x.fillStyle = s.tc;
-  x.font = 'bold 11px system-ui,-apple-system,sans-serif';
-  x.textAlign = 'center';
-  x.fillText(s.tag, px + pw - 28 - tw/2, sy + 30);
-});
-
-// Botón confirmar
-const by = py + ph - 58;
-rr(x, px + 14, by, pw - 28, 42, 12);
-x.fillStyle = '#25D366';
-x.fill();
-x.fillStyle = '#04361b';
-x.font = 'bold 15px system-ui,-apple-system,sans-serif';
-x.textAlign = 'center';
-x.fillText('✓ Reserva confirmada — te llega por WhatsApp', px + pw/2, by + 26);
-
-function rr(ctx, x, y, w, h, r) {
-  if (typeof r === 'number') r = [r, r, r, r];
-  ctx.beginPath();
-  ctx.moveTo(x + r[0], y);
-  ctx.lineTo(x + w - r[1], y);
-  ctx.arcTo(x + w, y, x + w, y + r[1], r[1]);
-  ctx.lineTo(x + w, y + h - r[2]);
-  ctx.arcTo(x + w, y + h, x + w - r[2], y + h, r[2]);
-  ctx.lineTo(x + r[3], y + h);
-  ctx.arcTo(x, y + h, x, y + h - r[3], r[3]);
-  ctx.lineTo(x, y + r[0]);
-  ctx.arcTo(x, y, x + r[0], y, r[0]);
-  ctx.closePath();
-}
-
-function dl() {
-  const a = document.createElement('a');
-  a.download = 'og.png';
-  a.href = c.toDataURL('image/png');
-  a.click();
-}
-</script>
+</div>
 </body>
 </html>

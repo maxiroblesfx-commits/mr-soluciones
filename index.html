@@ -170,13 +170,17 @@
   }
   /* captura real del sitio */
   .demo .thumb .shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;background:#1F2A44}
-  /* velo oscuro para que el texto se lea sobre la captura */
-  .demo .thumb:before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(20,31,51,.02) 35%,rgba(20,31,51,.82) 100%)}
+  /* Velo oscuro. Las capturas traen su propio titular, así que la franja de
+     abajo tiene que quedar casi opaca: es donde va el nombre y si no, los dos
+     textos se superponen. Arriba se mantiene limpio para que se vea el sitio. */
+  .demo .thumb:before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(20,31,51,0) 48%,rgba(20,31,51,.38) 70%,rgba(20,31,51,.92) 89%,rgba(20,31,51,.97) 100%)}
   /* color de respaldo (se ve solo si la captura no carga) */
   .demo .thumb.veo{background:linear-gradient(135deg,#7b2ff7,#f107a3)}
   .demo .thumb.piel{background:linear-gradient(135deg,#11998e,#38ef7d)}
   .demo .thumb.estudio{background:linear-gradient(135deg,#1F2A44,#2c4a7a)}
   .demo .thumb.casa{background:linear-gradient(135deg,#c9a227,#ef9b0f)}
+  .demo .thumb.resto{background:linear-gradient(135deg,#3a2418,#8a5a2b)}
+  .demo .thumb.vitrina{background:linear-gradient(135deg,#1F2A44,#c9a227)}
   .demo .thumb .label{position:relative;z-index:2;font-weight:800;font-size:1.15rem;text-shadow:0 2px 10px rgba(0,0,0,.6)}
   .demo .thumb .vert{position:absolute;top:13px;right:13px;z-index:2;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);padding:5px 11px;border-radius:999px;font-size:.7rem;font-weight:700;letter-spacing:.04em}
   .demo .body{padding:18px 20px 22px;display:flex;flex-direction:column;flex:1}
@@ -360,7 +364,7 @@
     <div class="demos-grid">
       <!-- Demo 1 -->
       <div class="demo reveal">
-        <div class="thumb veo"><img class="shot" src="assets/demos/veo.webp" alt="Pelotero inflable — Veo Veo Diversiones" loading="lazy" onerror="this.remove()" /><span class="vert">Salón infantil</span><span class="label">Veo Veo Diversiones</span></div>
+        <div class="thumb veo"><img class="shot" src="assets/demos/veo.webp" alt="Inicio del sitio de Veo Veo Diversiones" loading="lazy" onerror="this.remove()" /><span class="vert">Salón infantil</span><span class="label">Veo Veo Diversiones</span></div>
         <div class="body">
           <p>Pelotero y salón de cumpleaños. Los papás reservan la fecha online, ven la disponibilidad real y reciben la confirmación por WhatsApp. Incluye panel de administración y check-in.</p>
           <a class="ver" href="https://veo-veo-diversiones.web.app/index.html" target="_blank" rel="noopener">
@@ -371,7 +375,7 @@
 
       <!-- Demo 2 -->
       <div class="demo reveal">
-        <div class="thumb piel"><img class="shot" src="assets/demos/mipielideal.webp" alt="Centro de estética y belleza — MiPielIdeal" loading="lazy" onerror="this.remove()" /><span class="vert">Estética / Peluquería</span><span class="label">MiPielIdeal</span></div>
+        <div class="thumb piel"><img class="shot" src="assets/demos/mipielideal.webp" alt="Inicio del sitio de MiPielIdeal" loading="lazy" onerror="this.remove()" /><span class="vert">Estética / Peluquería</span><span class="label">MiPielIdeal</span></div>
         <div class="body">
           <p>Centro de estética con reserva de turnos por servicio y asistente de IA que responde dudas y deriva al turno. Pensado para peluquerías, spas y centros de belleza.</p>
           <a class="ver" href="https://maxiroblesfx-commits.github.io/mipielideal/" target="_blank" rel="noopener">
@@ -382,7 +386,7 @@
 
       <!-- Demo 3 -->
       <div class="demo reveal">
-        <div class="thumb estudio"><img class="shot" src="assets/demos/tu-estudio-ideal.webp" alt="Escritorio profesional — Tu EstudioIdeal" loading="lazy" onerror="this.remove()" /><span class="vert">Consultorio</span><span class="label">Tu EstudioIdeal</span></div>
+        <div class="thumb estudio"><img class="shot" src="assets/demos/tu-estudio-ideal.webp" alt="Inicio del sitio de Tu EstudioIdeal" loading="lazy" onerror="this.remove()" /><span class="vert">Consultorio</span><span class="label">Tu EstudioIdeal</span></div>
         <div class="body">
           <p>Sitio profesional con agenda de consultas para estudios y consultorios. El cliente pide su cita sin llamadas ni idas y vueltas, y vos recibís cada solicitud ordenada.</p>
           <a class="ver" href="https://maxiroblesfx-commits.github.io/tu-estudio-ideal/" target="_blank" rel="noopener">
@@ -393,10 +397,32 @@
 
       <!-- Demo 4 -->
       <div class="demo reveal">
-        <div class="thumb casa"><img class="shot" src="assets/demos/tucasaideal.webp" alt="Casas modernas — TuCasaIdeal" loading="lazy" onerror="this.remove()" /><span class="vert">Inmobiliaria</span><span class="label">TuCasaIdeal</span></div>
+        <div class="thumb casa"><img class="shot" src="assets/demos/tucasaideal.webp" alt="Inicio del sitio de TuCasaIdeal" loading="lazy" onerror="this.remove()" /><span class="vert">Inmobiliaria</span><span class="label">TuCasaIdeal</span></div>
         <div class="body">
           <p>Inmobiliaria con catálogo de propiedades y solicitud de visitas online. Muestra cómo el mismo motor de reservas se adapta a cualquier rubro que coordine encuentros.</p>
           <a class="ver" href="https://tucasaideal.vercel.app/" target="_blank" rel="noopener">
+            Ver demo <svg viewBox="0 0 24 24"><path d="M5 12h12.2l-5.1-5.1L13.5 5.5 21 13l-7.5 7.5-1.4-1.4 5.1-5.1H5z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Demo 5 -->
+      <div class="demo reveal">
+        <div class="thumb resto"><img class="shot" src="assets/demos/antaresa.webp" alt="Inicio del sitio de ANTARESa" loading="lazy" onerror="this.remove()" /><span class="vert">Resto / Café</span><span class="label">ANTARESa</span></div>
+        <div class="body">
+          <p>Carta digital con foto y precio de cada plato, para mirar desde el celular en la mesa. El cliente pide por WhatsApp y reserva sin llamar. Pensado para bares, cafeterías y locales con carta que cambia seguido.</p>
+          <a class="ver" href="https://maxiroblesfx-commits.github.io/antaresa-resto-cafe/" target="_blank" rel="noopener">
+            Ver demo <svg viewBox="0 0 24 24"><path d="M5 12h12.2l-5.1-5.1L13.5 5.5 21 13l-7.5 7.5-1.4-1.4 5.1-5.1H5z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Demo 6 -->
+      <div class="demo reveal">
+        <div class="thumb vitrina"><img class="shot" src="assets/demos/vitrina.webp" alt="Vidriera con el selector de rubros y un sitio de ejemplo dentro de un marco de navegador" loading="lazy" onerror="this.remove()" /><span class="vert">4 rubros</span><span class="label">Vidriera de rubros</span></div>
+        <div class="body">
+          <p>El mismo motor con la piel de cuatro negocios distintos: peluquería, restaurante, pelotero y tienda. Tocá un rubro y mirá cómo cambian la marca, los colores y las secciones al instante. Así se ve tu sitio antes de que exista.</p>
+          <a class="ver" href="https://plantilla-demos-mrobles.web.app/vitrina.html" target="_blank" rel="noopener">
             Ver demo <svg viewBox="0 0 24 24"><path d="M5 12h12.2l-5.1-5.1L13.5 5.5 21 13l-7.5 7.5-1.4-1.4 5.1-5.1H5z"/></svg>
           </a>
         </div>
